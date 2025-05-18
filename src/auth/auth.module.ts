@@ -2,8 +2,6 @@ import { SocialMediaAuthController } from '@/auth/social-media/social-media-auth
 import { SocialMediaAuthService } from '@/auth/social-media/social-media-auth.service'
 import { GithubStrategy } from '@/auth/strategies/github.strategy'
 import { GoogleStrategy } from '@/auth/strategies/google.strategy'
-import { TwitchAuthStrategy } from '@/auth/strategies/twitch.strategy'
-import { YandexAuthStrategy } from '@/auth/strategies/yandex.strategy'
 import { EmailModule } from '@/email/email.module'
 import { PrismaService } from '@/prisma.service'
 
@@ -25,11 +23,11 @@ import { JwtStrategy } from './strategies/jwt.strategy'
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
-			useFactory: getJwtConfig
+			useFactory: getJwtConfig,
 		}),
 		UserModule,
 		EmailModule,
-		SmsModule
+		SmsModule,
 	],
 	controllers: [AuthController, SocialMediaAuthController, SmsAuthController],
 	providers: [
@@ -39,11 +37,8 @@ import { JwtStrategy } from './strategies/jwt.strategy'
 		RefreshTokenService,
 		GoogleStrategy,
 		GithubStrategy,
-		// AppleAuthStrategy,
-		TwitchAuthStrategy,
-		YandexAuthStrategy,
 		SocialMediaAuthService,
-		SmsAuthService
-	]
+		SmsAuthService,
+	],
 })
 export class AuthModule {}

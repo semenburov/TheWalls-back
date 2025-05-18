@@ -8,15 +8,15 @@ import { UserModule } from './user/user.module'
 @Module({
 	imports: [
 		ConfigModule.forRoot({
-			isGlobal: true
+			isGlobal: true,
 		}),
 		GoogleRecaptchaModule.forRootAsync({
 			imports: [ConfigModule],
 			useFactory: getGoogleRecaptchaConfig,
-			inject: [ConfigService]
+			inject: [ConfigService],
 		}),
 		AuthModule,
-		UserModule
-	]
+		UserModule,
+	],
 })
 export class AppModule {}
