@@ -12,25 +12,18 @@ async function bootstrap() {
 			{ path: 'auth/google/redirect', method: RequestMethod.GET },
 			{ path: 'auth/github', method: RequestMethod.GET },
 			{ path: 'auth/github/redirect', method: RequestMethod.GET },
-			{ path: 'auth/twitch', method: RequestMethod.GET },
-			{ path: 'auth/twitch/redirect', method: RequestMethod.GET },
-			{ path: 'auth/yandex', method: RequestMethod.GET },
-			{ path: 'auth/yandex/redirect', method: RequestMethod.GET },
 			{ path: 'auth/telegram/redirect', method: RequestMethod.GET },
-			{ path: 'verify-email', method: RequestMethod.GET }
-		]
+			{ path: 'verify-email', method: RequestMethod.GET },
+		],
 	})
 
 	app.use(cookieParser())
 	app.enableCors({
-		origin: [
-			'http://localhost:3000',
-			'https://e61b-106-249-226-194.ngrok-free.app'
-		],
+		origin: ['http://localhost:3000'],
 		credentials: true,
-		exposedHeaders: 'set-cookie'
+		exposedHeaders: 'set-cookie',
 	})
 
-	await app.listen(4200)
+	await app.listen(4000)
 }
 bootstrap()
