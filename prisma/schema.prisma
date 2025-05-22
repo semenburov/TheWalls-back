@@ -1,36 +1,40 @@
+// Генератор Prisma Client для роботи з БД у Node.js/TypeScript
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js" // Використовуємо клієнт для JS/TS
 }
 
+// Джерело даних: підключення до PostgreSQL через змінну оточення
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql" // Тип бази даних — PostgreSQL
+  url      = env("DATABASE_URL") // Рядок підключення з .env файлу
 }
 
+// Модель користувача, що відповідає таблиці users у БД
 model User {
-  id    String  @id @default(cuid())
-  email String? @unique
-  phone String? @unique
+  id    String  @id @default(cuid()) // Унікальний ідентифікатор, генерується автоматично
+  email String? @unique // Email користувача, необов'язковий, унікальний
+  phone String? @unique // Телефон користувача, необов'язковий, унікальний
 
-  name       String?
-  password   String?
-  avatarPath String? @map("avatar_path")
+  name       String? // Ім'я користувача, необов'язкове
+  password   String? // Пароль (зазвичай хеш), необов'язковий
+  avatarPath String? @map("avatar_path") // Шлях до аватарки, зберігається у полі avatar_path
 
-  telegramId String? @map("telegram_id")
+  telegramId String? @map("telegram_id") // Telegram ID, зберігається у полі telegram_id
 
-  otpCode      String?   @map("otp_code")
-  otpExpiresAt DateTime? @map("otp_expires_at")
+  otpCode      String?   @map("otp_code") // Одноразовий код (OTP), зберігається у otp_code
+  otpExpiresAt DateTime? @map("otp_expires_at") // Час закінчення OTP, зберігається у otp_expires_at
 
-  verificationToken String? @default(cuid()) @map("verification_token")
+  verificationToken String? @default(cuid()) @map("verification_token") // Токен для верифікації, генерується автоматично, зберігається у verification_token
 
-  rights Role[] @default([USER])
+  rights Role[] @default([USER]) // Масив ролей користувача, за замовчуванням USER
 
-  @@map("users")
+  @@map("users") // Відповідає таблиці users у базі даних
 }
 
+// Перелік можливих ролей користувача
 enum Role {
-  USER
-  PREMIUM
-  MANAGER
-  ADMIN
+  USER // Звичайний користувач
+  PREMIUM // Користувач з преміум-правами
+  MANAGER // Менеджер
+  ADMIN // Адміністратор
 }
