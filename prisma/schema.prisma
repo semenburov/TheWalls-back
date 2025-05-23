@@ -26,7 +26,13 @@ model User {
 
   verificationToken String? @default(cuid()) @map("verification_token") // Токен для верифікації, генерується автоматично, зберігається у verification_token
 
-  rights Role[] @default([USER]) // Масив ролей користувача, за замовчуванням USER
+  rights         Role[]        @default([USER]) // Масив ролей користувача, за замовчуванням USER
+  societies      Society[]     @relation("SocietyUsers")
+  managerSociety Society[]     @relation("SocietyManager")
+  Haus           Haus[]
+  invites        Invite[]      @relation("UserInvites")
+  UserSociety    UserSociety[]
+  Report         Report[]
 
   @@map("users") // Відповідає таблиці users у базі даних
 }
@@ -37,4 +43,132 @@ enum Role {
   PREMIUM // Користувач з преміум-правами
   MANAGER // Менеджер
   ADMIN // Адміністратор
+}
+
+// Модель для зберігання інформації про суспільство
+// Відповідає таблиці society у БД
+// Зберігає дані про назву, тип, адресу, менеджера та користувачів
+// Кожне суспільство може мати кілька користувачів та один менеджер
+// Менеджер може бути призначений для кількох суспільств
+// Користувач може бути членом кількох суспільств
+model Society {
+  id            String        @id @default(uuid())
+  name          String
+  type          String
+  address       String?
+  managerId     String
+  manager       User          @relation("SocietyManager", fields: [managerId], references: [id])
+  users         User[]        @relation("SocietyUsers")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  Haus          Haus[]
+  Tariff        Tariff[]
+  userSocieties UserSociety[]
+  invites       Invite[]
+}
+
+model UserSociety {
+  id        String   @id @default(uuid())
+  userId    String
+  societyId String
+  role      String // member, manager, etc.
+  user      User     @relation(fields: [userId], references: [id])
+  society   Society  @relation(fields: [societyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, societyId])
+}
+
+model Invite {
+  id          String   @id @default(uuid())
+  societyId   String
+  email       String
+  token       String   @unique
+  role        String
+  status      String
+  invitedById String
+  invitedBy   User     @relation("UserInvites", fields: [invitedById], references: [id])
+  society     Society  @relation(fields: [societyId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для зберігання інформації про нерухомість
+// Відповідає таблиці hause у БД
+// Зберігає дані про тип нерухомості, адресу, власника та суспільство
+// Кожна нерухомість може належати одному суспільству та одному власнику
+// Власник може мати кілька нерухомостей
+// Суспільство може мати кілька нерухомостей
+// Нерухомість може бути призначена одному власнику або бути без власника
+model Haus {
+  id        String   @id @default(uuid())
+  name      String
+  type      String // apartment, garage, plot, etc.
+  address   String?
+  societyId String
+  ownerId   String? // можна null, якщо не призначено користувача
+  society   Society  @relation(fields: [societyId], references: [id])
+  owner     User?    @relation(fields: [ownerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Meter     Meter[]
+}
+
+// Модель для зберігання інформації про лічильники
+// Відповідає таблиці meter у БД
+// Зберігає дані про тип лічильника, серійний номер, місце розташування та нерухомість
+// Кожен лічильник може належати одній нерухомості
+// Нерухомість може мати кілька лічильників
+// Лічильник може бути призначений одній нерухомості або бути без призначення
+// Лічильник може бути водяним, газовим, електричним тощо
+// Серійний номер лічильника є унікальним ідентифікатором
+// Місце розташування лічильника може бути додатковим (кімната, підвал тощо)
+// Лічильник може мати кілька типів (водяний, газовий, електричний тощо)
+// Лічильник може мати кілька серійних номерів (для різних типів)
+// Лічильник може мати кілька місць розташування (для різних типів)
+// Лічильник може мати кілька нерухомостей (для різних типів)
+model Meter {
+  id        String   @id @default(uuid())
+  type      String // water, gas, electricity, etc.
+  serial    String // серійний номер
+  location  String? // додаткове місце (кімната, підвал і т.п.)
+  hausId    String
+  haus      Haus     @relation(fields: [hausId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Report    Report[]
+}
+
+model Report {
+  id        String   @id @default(uuid())
+  value     Float
+  date      DateTime
+  meterId   String
+  meter     Meter    @relation(fields: [meterId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Модель для зберігання інформації про тарифи
+// Відповідає таблиці tariff у БД
+// Зберігає дані про назву, тип, ціну та суспільство
+// Кожен тариф може належати одному суспільству
+// Суспільство може мати кілька тарифів
+// Тариф може бути водяним, газовим, електричним тощо
+// Ціна тарифу є числом з плаваючою комою
+// Назва тарифу є рядком
+// Тип тарифу є рядком (водяний, газовий, електричний тощо)
+// Тариф може мати кілька суспільств (для різних типів)
+model Tariff {
+  id        String   @id @default(uuid())
+  name      String
+  type      String // water, gas, electricity, etc.
+  price     Float
+  societyId String
+  society   Society  @relation(fields: [societyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

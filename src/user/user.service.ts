@@ -2,10 +2,10 @@ import { AuthDto } from '@/auth/dto/auth.dto'
 import { TUserSocial } from '@/auth/social-media/social-media-auth.types'
 import { VERIFY_EMAIL_URL } from '@/constants'
 import { EmailService } from '@/email/email.service'
+import { PrismaService } from '@/prisma/prisma.service'
 import { Injectable } from '@nestjs/common'
 import type { User } from '@prisma/client'
 import { hash } from 'argon2'
-import { PrismaService } from 'src/prisma.service'
 
 @Injectable() // Декоратор, що дозволяє інжекцію цього сервісу через DI контейнер NestJS
 export class UserService {

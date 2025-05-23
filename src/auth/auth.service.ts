@@ -1,6 +1,6 @@
 import { VERIFY_EMAIL_URL } from '@/constants'
 import { EmailService } from '@/email/email.service'
-import { PrismaService } from '@/prisma.service'
+import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
 import {
 	BadRequestException,

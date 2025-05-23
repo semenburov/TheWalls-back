@@ -3,7 +3,7 @@ import { SocialMediaAuthService } from '@/auth/social-media/social-media-auth.se
 import { GithubStrategy } from '@/auth/strategies/github.strategy'
 import { GoogleStrategy } from '@/auth/strategies/google.strategy'
 import { EmailModule } from '@/email/email.module'
-import { PrismaService } from '@/prisma.service'
+import { PrismaService } from '@/prisma/prisma.service'
 import { UserModule } from '@/user/user.module'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
