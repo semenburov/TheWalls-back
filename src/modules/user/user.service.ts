@@ -28,10 +28,8 @@ export class UserService {
 
 		if (!user) return null
 
-		// Глобальні ролі з поля rights (enum array)
 		const roles: string[] = user.rights ?? []
 
-		// Масив товариств з роллю у кожному
 		const societies = user.societies.map(societyOnUser => ({
 			id: societyOnUser.society.id,
 			name: societyOnUser.society.name,
