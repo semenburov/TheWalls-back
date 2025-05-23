@@ -14,6 +14,39 @@ import { v4 as uuidv4 } from 'uuid'
 export class UserService {
 	constructor(private readonly prisma: PrismaService) {}
 
+	async getProfile(userId: string) {
+		const user = await this.prisma.user.findUnique({
+			where: { id: userId },
+			include: {
+				societies: {
+					include: {
+						society: true,
+					},
+				},
+			},
+		})
+
+		if (!user) return null
+
+		// Глобальні ролі з поля rights (enum array)
+		const roles: string[] = user.rights ?? []
+
+		// Масив товариств з роллю у кожному
+		const societies = user.societies.map(societyOnUser => ({
+			id: societyOnUser.society.id,
+			name: societyOnUser.society.name,
+			role: societyOnUser.role,
+		}))
+
+		return {
+			id: user.id,
+			email: user.email,
+			name: user.name,
+			roles,
+			societies,
+		}
+	}
+
 	async inviteUser(dto: InviteUserDto, invitedById: string) {
 		// Перевірити, що ініціатор — manager товариства
 		const society = await this.prisma.society.findUnique({
