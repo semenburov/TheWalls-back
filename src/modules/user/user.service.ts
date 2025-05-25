@@ -18,7 +18,7 @@ export class UserService {
 		const user = await this.prisma.user.findUnique({
 			where: { id: userId },
 			include: {
-				societies: {
+				UserSociety: {
 					include: {
 						society: true,
 					},
@@ -30,7 +30,7 @@ export class UserService {
 
 		const roles: string[] = user.rights ?? []
 
-		const societies = user.societies.map(societyOnUser => ({
+		const societies = user.UserSociety.map(societyOnUser => ({
 			id: societyOnUser.society.id,
 			name: societyOnUser.society.name,
 			role: societyOnUser.role,
