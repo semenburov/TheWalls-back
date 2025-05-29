@@ -3,8 +3,9 @@ import { SocialMediaAuthService } from '@/auth/social-media/social-media-auth.se
 import { GithubStrategy } from '@/auth/strategies/github.strategy'
 import { GoogleStrategy } from '@/auth/strategies/google.strategy'
 import { EmailModule } from '@/email/email.module'
-import { PrismaService } from '@/prisma/prisma.service'
 import { UserModule } from '@/modules/user/user.module'
+import { PrismaService } from '@/prisma/prisma.service'
+import { HttpModule } from '@nestjs/axios'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
@@ -23,6 +24,7 @@ import { JwtStrategy } from './strategies/jwt.strategy'
 		}),
 		UserModule, // Модуль користувачів (логіка, сервіси, репозиторії)
 		EmailModule, // Модуль для роботи з email (відправка листів, підтвердження тощо)
+		HttpModule, // Модуль для роботи з HTTP запитами (наприклад, для reCAPTCHA)
 	],
 	controllers: [
 		AuthController, // Основний контролер для авторизації (логін, реєстрація, токени)

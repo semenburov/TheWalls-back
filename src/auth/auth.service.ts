@@ -10,7 +10,7 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { Role, type User } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import { verify } from 'argon2'
 import { omit } from 'lodash'
 import { lastValueFrom } from 'rxjs'
