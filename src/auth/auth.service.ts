@@ -1,7 +1,8 @@
 import { VERIFY_EMAIL_URL } from '@/constants'
 import { EmailService } from '@/email/email.service'
+import { UserService } from '@/modules/user/user.service'
 import { PrismaService } from '@/prisma/prisma.service'
-import { UserService } from '@/user/user.service'
+import { HttpService } from '@nestjs/axios'
 import {
 	BadRequestException,
 	Injectable,
@@ -12,6 +13,7 @@ import { JwtService } from '@nestjs/jwt'
 import { Role, type User } from '@prisma/client'
 import { verify } from 'argon2'
 import { omit } from 'lodash'
+import { lastValueFrom } from 'rxjs'
 import { AuthDto } from './dto/auth.dto'
 
 @Injectable() // Декоратор, що дозволяє інжекцію цього сервісу через DI контейнер NestJS
@@ -20,7 +22,8 @@ export class AuthService {
 		private jwt: JwtService, // Сервіс для роботи з JWT токенами (генерація, перевірка)
 		private userService: UserService, // Сервіс для роботи з користувачами (БД)
 		private emailService: EmailService, // Сервіс для відправки email (верифікація, повідомлення)
-		private prisma: PrismaService // Сервіс для прямої роботи з БД через Prisma
+		private prisma: PrismaService, // Сервіс для прямої роботи з БД через Prisma
+		private readonly httpService: HttpService
 	) {}
 
 	private readonly TOKEN_EXPIRATION_ACCESS = '1h' // Термін дії access токена (1 година)
@@ -36,6 +39,19 @@ export class AuthService {
 		return this.buildResponseObject(user) // Повертаємо токени та користувача
 	}
 
+	async verifyRecaptcha(token: string) {
+		const secret = process.env.RECAPTCHA_SECRET_KEY
+		const url = 'https://www.google.com/recaptcha/api/siteverify'
+		const params = new URLSearchParams({ secret, response: token })
+
+		const response$ = this.httpService.post(url, params)
+		const { data } = await lastValueFrom(response$)
+
+		if (!data.success) {
+			throw new BadRequestException('Recaptcha validation failed')
+		}
+	}
+
 	/**
 	 * Реєстрація нового користувача.
 	 * @param dto - DTO з email та паролем
@@ -43,6 +59,7 @@ export class AuthService {
 	 * @throws BadRequestException, якщо користувач вже існує
 	 */
 	async register(dto: AuthDto) {
+		await this.verifyRecaptcha(dto.recaptchaToken) // Перевіряємо reCAPTCHA
 		const userExists = await this.userService.getByEmail(dto.email) // Перевіряємо, чи існує користувач
 		if (userExists) {
 			throw new BadRequestException('User already exists') // Якщо так — помилка

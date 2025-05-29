@@ -1,24 +1,25 @@
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import {
-	Controller,
-	Get,
-	Post,
 	Body,
-	Patch,
-	Param,
+	Controller,
 	Delete,
-	UseGuards,
+	Get,
+	Param,
+	Patch,
+	Post,
 	Request,
+	UseGuards,
 } from '@nestjs/common'
 import {
-	ApiTags,
 	ApiBearerAuth,
 	ApiOperation,
 	ApiResponse,
+	ApiTags,
 } from '@nestjs/swagger'
-import { SocietyService } from './society.service'
 import { CreateSocietyDto } from './dto/create-society.dto'
 import { UpdateSocietyDto } from './dto/update-society.dto'
-import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
+import { SocietyEntity } from './entities/society.entity'
+import { SocietyService } from './society.service'
 
 @ApiTags('Societies')
 @ApiBearerAuth()
@@ -29,6 +30,15 @@ export class SocietyController {
 
 	@Post()
 	@ApiOperation({ summary: 'Створити нове товариство (автор стає manager)' })
+	@ApiResponse({
+		status: 201,
+		description: 'Товариство створено',
+		type: SocietyEntity,
+	})
+	@ApiResponse({
+		status: 409,
+		description: 'Товариство з таким email або name вже існує',
+	})
 	async create(@Body() dto: CreateSocietyDto, @Request() req) {
 		return this.societyService.create(dto, req.user.id)
 	}

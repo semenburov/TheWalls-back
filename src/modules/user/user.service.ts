@@ -1,18 +1,71 @@
 // src/modules/user/user.service.ts
 
+import { AuthDto } from '@/auth/dto/auth.dto'
+import { VERIFY_EMAIL_URL } from '@/constants'
+import { EmailService } from '@/email/email.service'
+import { PrismaService } from '@/prisma/prisma.service'
 import {
+	ConflictException,
+	ForbiddenException,
 	Injectable,
 	NotFoundException,
-	ForbiddenException,
-	ConflictException,
 } from '@nestjs/common'
-import { PrismaService } from '@/prisma/prisma.service'
-import { InviteUserDto } from './dto/invite-user.dto'
+import type { User } from '@prisma/client'
+import { hash } from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
+import { InviteUserDto } from './dto/invite-user.dto'
+
+import { TUserSocial } from '@/auth/social-media/social-media-auth.types'
 
 @Injectable()
 export class UserService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private emailService: EmailService // Сервіс для відправки email (верифікація, повідомлення)
+	) {}
+
+	/**
+	 * Знаходить або створює користувача за профілем із соцмережі.
+	 * @param profile - Дані користувача з соцмережі (TUserSocial)
+	 * @returns Об'єкт користувача з БД
+	 */
+	async findOrCreateSocialUser(profile: TUserSocial) {
+		const email = profile.email // Email з профілю соцмережі
+		let user: User | null = null
+
+		if (email) {
+			user = await this.getByEmail(email) // Якщо є email — шукаємо користувача
+		}
+
+		if (!user) {
+			user = await this._createSocialUser(profile) // Якщо не знайдено — створюємо нового користувача
+		}
+
+		return user
+	}
+
+	/**
+	 * Приватний метод для створення користувача з профілю соцмережі.
+	 * @param profile - Дані користувача з соцмережі
+	 * @returns Новий об'єкт користувача
+	 */
+	private async _createSocialUser(profile: TUserSocial): Promise<User> {
+		const verificationToken = profile.email
+			? {
+					verificationToken: null, // Якщо є email — не потрібен токен для верифікації
+				}
+			: {}
+
+		return this.prisma.user.create({
+			data: {
+				email: profile.email || '', // Email або порожній рядок
+				name: profile.name || '', // Ім'я або порожній рядок
+				password: '', // Пароль порожній (логін через соцмережу)
+				...verificationToken, // Додаємо verificationToken, якщо потрібно
+				avatarPath: profile.avatarPath || null, // Аватарка або null
+			},
+		})
+	}
 
 	async getProfile(userId: string) {
 		const user = await this.prisma.user.findUnique({
@@ -94,6 +147,69 @@ export class UserService {
 			data: { status: 'accepted' },
 		})
 		return { message: 'Invite accepted' }
+	}
+
+	/**
+	 * Оновлює дані користувача за id.
+	 * @param id - ID користувача
+	 * @param data - Дані для оновлення (частковий User)
+	 * @returns Оновлений об'єкт користувача
+	 */
+	async update(id: string, data: Partial<User>) {
+		const user = await this.prisma.user.update({
+			where: {
+				id, // Пошук по id
+			},
+			data, // Дані для оновлення
+		})
+
+		// Відправляємо лист для підтвердження email, якщо змінився email або токен
+		await this.emailService.sendVerification(
+			user.email,
+			`${VERIFY_EMAIL_URL}${user.verificationToken}`
+		)
+
+		return user
+	}
+
+	/**
+	 * Повертає користувача за його id.
+	 * @param id - ID користувача
+	 * @returns Об'єкт користувача або null, якщо не знайдено
+	 */
+	async getById(id: string) {
+		return this.prisma.user.findUnique({
+			where: {
+				id, // Пошук по id
+			},
+		})
+	}
+
+	/**
+	 * Повертає користувача за email.
+	 * @param email - Email користувача
+	 * @returns Об'єкт користувача або null, якщо не знайдено
+	 */
+	async getByEmail(email: string) {
+		return this.prisma.user.findUnique({
+			where: {
+				email, // Пошук по email
+			},
+		})
+	}
+
+	/**
+	 * Створює нового користувача за DTO (логін/реєстрація через email).
+	 * @param dto - DTO з email та паролем
+	 * @returns Новий об'єкт користувача
+	 */
+	async create(dto: AuthDto) {
+		return this.prisma.user.create({
+			data: {
+				...dto, // Всі поля з DTO (email, name, тощо)
+				password: await hash(dto.password), // Хешуємо пароль перед збереженням
+			},
+		})
 	}
 
 	async getSocietyUsers(societyId: string, requesterId: string) {

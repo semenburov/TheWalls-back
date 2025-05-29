@@ -26,7 +26,7 @@ async function bootstrap() {
 	app.use(cookieParser()) // Додаємо middleware для парсингу cookie (для роботи з refresh токенами)
 
 	app.enableCors({
-		//origin: ['http://localhost:3000'], // Дозволяємо запити тільки з цього origin (frontend)
+		origin: ['http://localhost:3000'], // Дозволяємо запити тільки з цього origin (frontend)
 		credentials: true, // Дозволяємо надсилати куки та заголовки авторизації
 		exposedHeaders: 'set-cookie', // Додаємо можливість читати заголовок set-cookie на клієнті
 	})

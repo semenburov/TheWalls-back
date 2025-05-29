@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config' // Модуль т�
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha' // Модуль для інтеграції Google reCAPTCHA
 import { AuthModule } from './auth/auth.module' // Модуль авторизації (логін, реєстрація, соцмережі)
 import { getGoogleRecaptchaConfig } from './config/google-recaptcha.config' // Фабрика для асинхронної конфігурації reCAPTCHA
-import { UserModule } from './user/user.module' // Модуль користувачів (логіка, контролер, сервіси)
+import { UserModule } from './modules/user/user.module' // Модуль користувачів (логіка, контролер, сервіси)
 import { SocietyModule } from './modules/society/society.module' // Модуль для роботи з суспільством (логіка, контролер, сервіси)
 import { HausModule } from './modules/haus/haus.module' // Модуль для роботи з об'єктами (логіка, контролер, сервіси)
 import { MeterModule } from './modules/meter/meter.module' // Модуль для роботи з лічильниками (логіка, контролер, сервіси)

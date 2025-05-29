@@ -7,5 +7,6 @@ import { PrismaModule } from '@/prisma/prisma.module'
 	imports: [PrismaModule],
 	controllers: [SocietyController],
 	providers: [SocietyService],
+	exports: [SocietyService], // якщо треба в інших модулях
 })
 export class SocietyModule {}

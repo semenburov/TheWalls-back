@@ -1,0 +1,175 @@
+│   .DS_Store
+│   .env
+│   .eslintrc.js
+│   .gitignore
+│   bun.lockb
+│   instruction.txt
+│   nest-cli.json
+│   package.json
+│   README.md
+│   tsconfig.build.json
+│   tsconfig.json
+│   yarn.lock
+│
+├───emails
+│       confirmation.email.tsx
+│
+├───prisma
+│   │   schema.prisma
+│   │
+│   └───migrations
+│       │   migration_lock.toml
+│       │
+│       ├───20250518194741_init
+│       │       migration.sql
+│       │
+│       ├───20250522132640_added_society_and_house
+│       │       migration.sql
+│       │
+│       ├───20250522133646_rename_hause_to_haus
+│       │       migration.sql
+│       │
+│       ├───20250522133914_add_meter_model
+│       │       migration.sql
+│       │
+│       ├───20250522134453_add_tariff_model
+│       │       migration.sql
+│       │
+│       ├───20250522135408_fix_user_invites_relation
+│       │       migration.sql
+│       │
+│       └───20250522140338_add_report_model
+│               migration.sql
+│
+└───src
+    │   .DS_Store
+    │   app.module.ts
+    │   constants.ts
+    │   main.ts
+    │
+    ├───auth
+    │   │   .DS_Store
+    │   │   auth.controller.ts
+    │   │   auth.module.ts
+    │   │   auth.service.ts
+    │   │   refresh-token.service.ts
+    │   │
+    │   ├───decorators
+    │   │       auth.decorator.ts
+    │   │       roles.decorator.ts
+    │   │       user.decorator.ts
+    │   │
+    │   ├───dto
+    │   │       auth.dto.ts
+    │   │
+    │   ├───guards
+    │   │       jwt.guard.ts
+    │   │       roles.guard.ts
+    │   │
+    │   ├───social-media
+    │   │       social-media-auth.controller.ts
+    │   │       social-media-auth.service.ts
+    │   │       social-media-auth.types.ts
+    │   │
+    │   └───strategies
+    │           apple.strategy.ts
+    │           github.strategy.ts
+    │           google.strategy.ts
+    │           jwt.strategy.ts
+    │
+    ├───config
+    │       google-recaptcha.config.ts
+    │       jwt.config.ts
+    │       mailer.config.ts
+    │
+    ├───email
+    │       email.module.ts
+    │       email.service.ts
+    │
+    ├───modules
+    │   ├───analytics
+    │   │       analytics.controller.ts
+    │   │       analytics.module.ts
+    │   │       analytics.service.ts
+    │   │
+    │   ├───haus
+    │   │   │   haus.controller.ts
+    │   │   │   haus.module.ts
+    │   │   │   haus.service.ts
+    │   │   │
+    │   │   ├───dto
+    │   │   │       create-haus.dto.ts
+    │   │   │       update-haus.dto.ts
+    │   │   │
+    │   │   └───entities
+    │   │           haus.entity.ts
+    │   │
+    │   ├───meter
+    │   │   │   meter.controller.ts
+    │   │   │   meter.module.ts
+    │   │   │   meter.service.ts
+    │   │   │
+    │   │   ├───dto
+    │   │   │       create-meter.dto.ts
+    │   │   │       update-meter.dto.ts
+    │   │   │
+    │   │   └───entities
+    │   │           meter.entity.ts
+    │   │
+    │   ├───meterReport
+    │   │   │   meterReport.controller.ts
+    │   │   │   meterReport.module.ts
+    │   │   │   meterReport.service.ts
+    │   │   │
+    │   │   ├───dto
+    │   │   │       create-meterReport.dto.ts
+    │   │   │       update-meterReport.dto.ts
+    │   │   │
+    │   │   └───entities
+    │   │           meterReport.entity.ts
+    │   │
+    │   ├───society
+    │   │   │   society.controller.ts
+    │   │   │   society.module.ts
+    │   │   │   society.service.ts
+    │   │   │
+    │   │   ├───dto
+    │   │   │       create-society.dto.ts
+    │   │   │       update-society.dto.ts
+    │   │   │
+    │   │   └───entities
+    │   │           society.entity.ts
+    │   │
+    │   ├───tariff
+    │   │   │   tariff.controller.ts
+    │   │   │   tariff.module.ts
+    │   │   │   tariff.service.ts
+    │   │   │
+    │   │   ├───dto
+    │   │   │       create-tariff.dto.ts
+    │   │   │       update-tariff.dto.ts
+    │   │   │
+    │   │   └───entities
+    │   │           tariff.entity.ts
+    │   │
+    │   └───user
+    │       │   user.controller.ts
+    │       │   user.module.ts
+    │       │   user.service.ts
+    │       │
+    │       ├───dto
+    │       │       invite-user.dto.ts
+    │       │       update-user.dto.ts
+    │       │       user-profile.dto.ts
+    │       │
+    │       └───entities
+    │               invite.entity.ts
+    │               user.entity.ts
+    │
+    ├───prisma
+    │       prisma.module.ts
+    │       prisma.service.ts
+    │
+    └───utils
+            is-dev.util.ts
+            validate-telegram-auth.util.ts

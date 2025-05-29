@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common' // Декоратор для мож�
 import { ConfigService } from '@nestjs/config' // Сервіс для доступу до змінних оточення (env)
 import { PassportStrategy } from '@nestjs/passport' // Базовий клас для створення стратегій Passport
 import { ExtractJwt, Strategy } from 'passport-jwt' // JWT-стратегія та утиліта для витягання токена з запиту
-import { UserService } from '../../user/user.service' // Сервіс для роботи з користувачами (БД)
+import { UserService } from '@/modules/user/user.service' // Сервіс для роботи з користувачами (БД)
 
 @Injectable() // Декоратор, що дозволяє інжекцію цього класу через DI контейнер NestJS
 export class JwtStrategy extends PassportStrategy(Strategy) {

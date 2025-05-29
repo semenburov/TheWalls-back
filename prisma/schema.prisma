@@ -9,6 +9,22 @@ datasource db {
   url      = env("DATABASE_URL") // Рядок підключення з .env файлу
 }
 
+// Перелік можливих типів суспільства
+// Використовується для визначення типу суспільства (будинок, сад, гараж тощо)
+enum SocietyType {
+  HOUSE
+  GARDEN
+  GARAGE
+}
+
+// Перелік можливих статусів суспільства
+// Використовується для визначення статусу суспільства (чернетка, активне, заблоковане)
+enum SocietyStatus {
+  DRAFT
+  ACTIVE
+  BLOCKED
+}
+
 // Модель користувача, що відповідає таблиці users у БД
 model User {
   id    String  @id @default(cuid()) // Унікальний ідентифікатор, генерується автоматично
@@ -33,6 +49,10 @@ model User {
   invites        Invite[]      @relation("UserInvites")
   UserSociety    UserSociety[]
   Report         Report[]
+  Society        Society[]
+  creatorSociety Society[]     @relation("Creator")
+  updaterSociety Society[]     @relation("Updater")
+  AuditLog       AuditLog[]
 
   @@map("users") // Відповідає таблиці users у базі даних
 }
@@ -53,18 +73,39 @@ enum Role {
 // Користувач може бути членом кількох суспільств
 model Society {
   id            String        @id @default(uuid())
-  name          String
-  type          String
+  name          String        @unique // Назва суспільства, має бути унікальною
+  email         String        @unique // Email суспільства, має бути унікальним
+  phone         String?       @unique // Телефон суспільства, необов'язковий, має бути унікальним
+  description   String? // Опис суспільства, необов'язковий
+  type          SocietyType
+  status        SocietyStatus @default(DRAFT)
   address       String?
   managerId     String
   manager       User          @relation("SocietyManager", fields: [managerId], references: [id])
   users         User[]        @relation("SocietyUsers")
   createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  updatedAt     DateTime?     @updatedAt
+  createdBy     String // ID користувача, який створив суспільство
+  createdByUser User          @relation("Creator", fields: [createdBy], references: [id])
+  updatedBy     String? // ID користувача, який останнім редагував суспільство
+  updatedByUser User?         @relation("Updater", fields: [updatedBy], references: [id])
   Haus          Haus[]
   Tariff        Tariff[]
   userSocieties UserSociety[]
   invites       Invite[]
+  members       User[]
+  AuditLog      AuditLog[]
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  societyId   String
+  action      String
+  performedBy String
+  performedAt DateTime @default(now())
+  details     Json?
+  society     Society  @relation(fields: [societyId], references: [id])
+  user        User     @relation(fields: [performedBy], references: [id])
 }
 
 model UserSociety {
