@@ -11,6 +11,7 @@ import { TariffModule } from './modules/tariff/tariff.module' // Модуль д
 import { UserModule as InviteUserModule } from './modules/user/user.module' // Модуль для роботи з користувачами (логіка, контролер, сервіси)
 import { MeterReportModule } from './modules/meterReport/meterReport.module' // Модуль для роботи з звітами по лічильникам (логіка, контролер, сервіси)
 import { AnalyticsModule } from './modules/analytics/analytics.module' // Модуль для роботи з аналітикою (логіка, контролер, сервіси)
+import { EstateObjectModule } from './modules/estateObject/estateObject.module'
 
 @Module({
 	imports: [
@@ -23,6 +24,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module' // Мод
 			inject: [ConfigService], // Інжектимо сервіс конфігурації у фабрику
 		}),
 		AuthModule, // Модуль авторизації (логін, реєстрація, токени, соцмережі)
+		EstateObjectModule, // Модуль для роботи з об'єктами (логіка, контролер, сервіси)
 		UserModule, // Модуль користувачів (профіль, список, оновлення email)
 		SocietyModule, // Модуль суспільства (логіка, контролер, сервіси)
 		HausModule, // Модуль для роботи з об'єктами (логіка, контролер, сервіси)

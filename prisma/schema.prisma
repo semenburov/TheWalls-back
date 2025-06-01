@@ -17,6 +17,34 @@ enum SocietyType {
   GARAGE
 }
 
+// Перелік можливих типів об'єктів
+// Використовується для визначення типу об'єкта (вулиця, вхід, ділянка, квартира)
+enum EstateObjectType {
+  STREET
+  ENTRANCE
+  PLOT
+  APARTMENT
+}
+
+model EstateObject {
+  id        String           @id @default(uuid())
+  name      String
+  type      EstateObjectType
+  area      Float
+  societyId String
+  parentId  String? // Parent object (null — якщо це вулиця)
+  ownerIds  String[] // Масив ID власників (може бути декілька)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  society  Society        @relation(fields: [societyId], references: [id])
+  parent   EstateObject?  @relation("ObjectToParent", fields: [parentId], references: [id])
+  children EstateObject[] @relation("ObjectToParent")
+
+  @@unique([name, parentId]) // Унікальність назви в межах parent
+  @@map("estateObject") // Відповідає таблиці estateObject у базі даних
+}
+
 // Перелік можливих статусів суспільства
 // Використовується для визначення статусу суспільства (чернетка, активне, заблоковане)
 enum SocietyStatus {
@@ -72,29 +100,30 @@ enum Role {
 // Менеджер може бути призначений для кількох суспільств
 // Користувач може бути членом кількох суспільств
 model Society {
-  id            String        @id @default(uuid())
-  name          String        @unique // Назва суспільства, має бути унікальною
-  email         String        @unique // Email суспільства, має бути унікальним
-  phone         String?       @unique // Телефон суспільства, необов'язковий, має бути унікальним
+  id            String         @id @default(uuid())
+  name          String         @unique // Назва суспільства, має бути унікальною
+  email         String         @unique // Email суспільства, має бути унікальним
+  phone         String?        @unique // Телефон суспільства, необов'язковий, має бути унікальним
   description   String? // Опис суспільства, необов'язковий
   type          SocietyType
-  status        SocietyStatus @default(DRAFT)
+  status        SocietyStatus  @default(DRAFT)
   address       String?
   managerId     String
-  manager       User          @relation("SocietyManager", fields: [managerId], references: [id])
-  users         User[]        @relation("SocietyUsers")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime?     @updatedAt
+  manager       User           @relation("SocietyManager", fields: [managerId], references: [id])
+  users         User[]         @relation("SocietyUsers")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime?      @updatedAt
   createdBy     String // ID користувача, який створив суспільство
-  createdByUser User          @relation("Creator", fields: [createdBy], references: [id])
+  createdByUser User           @relation("Creator", fields: [createdBy], references: [id])
   updatedBy     String? // ID користувача, який останнім редагував суспільство
-  updatedByUser User?         @relation("Updater", fields: [updatedBy], references: [id])
+  updatedByUser User?          @relation("Updater", fields: [updatedBy], references: [id])
   Haus          Haus[]
   Tariff        Tariff[]
   userSocieties UserSociety[]
   invites       Invite[]
   members       User[]
   AuditLog      AuditLog[]
+  EstateObject  EstateObject[]
 }
 
 model AuditLog {
