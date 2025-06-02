@@ -15,8 +15,8 @@ import { UpdateEstateObjectDto } from './dto/update-estateObject.dto'
 import { EstateObjectEntity } from './entities/estateObject.entity'
 import { EstateObjectService } from './estateObject.service'
 
-@ApiTags('EstateObjects')
-@Controller('estateObjects')
+@ApiTags('Objects')
+@Controller('objects')
 export class EstateObjectController {
 	constructor(private readonly estateObjectService: EstateObjectService) {}
 
